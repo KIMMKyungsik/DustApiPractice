@@ -147,10 +147,12 @@ class MainActivity : AppCompatActivity() {
 
         with(measuredValue) {
             binding.fineDustInformationTextView.text =
-                "미세먼지: ${pm10Value} ㎍/㎥ ${(pm10Grade ?: Grade.UNKNOWN).emoji}"
+                "미세먼지: ${pm10Value} ㎍/㎥"
+            binding.fineDustValueTextView.text = (pm10Grade ?: Grade.UNKNOWN).toString()
 
             binding.ultraFineDustInformationTextView.text =
-                "초미세먼지: ${pm25Value} ㎍/㎥ ${(pm25Grade ?: Grade.UNKNOWN).emoji}"
+                "초미세먼지: ${pm25Value} ㎍/㎥"
+            binding.ultraFineDustValueTextView.text = (pm25Grade ?: Grade.UNKNOWN).toString()
 
 
 
