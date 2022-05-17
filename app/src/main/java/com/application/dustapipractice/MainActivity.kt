@@ -10,17 +10,22 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityManagerCompat
+import com.application.dustapipractice.data.Repository
 import com.application.dustapipractice.databinding.ActivityMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var cancellationTokenSource: CancellationTokenSource? = null
+    private val scope = MainScope()
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
@@ -35,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cancellationTokenSource?.cancel()
+        scope.cancel()
     }
 
     @SuppressLint("MissingPermission")
@@ -72,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+
     @SuppressLint("MissingPermission")
     private fun fetchAirQualityData() {
         // fetchData
@@ -82,9 +89,16 @@ class MainActivity : AppCompatActivity() {
             cancellationTokenSource!!.token
         ).addOnSuccessListener { location ->
 
-            binding.textView.text = "${location.latitude},${location.longitude}"
+            scope.launch {
+                val mornitoringStation =
+                    Repository.getNearbyMornitoringStation(location.latitude, location.longitude)
+
+                binding.textView.text = mornitoringStation?.stationName
+
+            }
         }
     }
+
 
     companion object {
         private const val REQUEST_ACCESS_LOCATION_PERMISSIONS = 100
