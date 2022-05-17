@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        bindViews()
         initVariables()
         requestLocationPermissions()
     }
@@ -65,6 +66,14 @@ class MainActivity : AppCompatActivity() {
         // 마지막으로 확인된 위치 정보 얻기
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
     }
+
+    private fun bindViews(){
+        binding.refresh.setOnRefreshListener {
+            fetchAirQualityData()
+
+        }
+    }
+
 
     private fun requestLocationPermissions() {
         ActivityCompat.requestPermissions(
