@@ -2,6 +2,7 @@ package com.application.dustapipractice.data
 
 
 import com.application.dustapipractice.BuildConfig
+import com.application.dustapipractice.data.models.airquality.MeasuredValue
 import com.application.dustapipractice.data.models.mornitoringstation.MornitoringStation
 import com.application.dustapipractice.data.models.mornitoringstation.MornitoringStationsResponse
 import com.application.dustapipractice.data.services.AirKoreaApiService
@@ -34,6 +35,14 @@ object Repository {
             ?.minByOrNull { it.tm ?: Double.MAX_VALUE }
 
     }
+
+    suspend fun getLatestAirQualityData(stationName :String ):MeasuredValue?=
+        airKoreraAPIService.getRealtimeAirQualities(stationName)
+            .body()
+            ?.response
+            ?.body
+            ?.measuredValues
+            ?.firstOrNull()
 
     private val KakaoLocalAPIService: KakaoLocalAPIService by lazy {
         Retrofit.Builder()

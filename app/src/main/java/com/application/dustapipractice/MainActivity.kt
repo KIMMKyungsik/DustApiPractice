@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityManagerCompat
 import com.application.dustapipractice.data.Repository
+import com.application.dustapipractice.data.models.mornitoringstation.MornitoringStation
 import com.application.dustapipractice.databinding.ActivityMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
@@ -93,7 +94,11 @@ class MainActivity : AppCompatActivity() {
                 val mornitoringStation =
                     Repository.getNearbyMornitoringStation(location.latitude, location.longitude)
 
-                binding.textView.text = mornitoringStation?.stationName
+
+                val measuredValue=
+                    Repository.getLatestAirQualityData(mornitoringStation!!.stationName!!)
+
+
 
             }
         }
