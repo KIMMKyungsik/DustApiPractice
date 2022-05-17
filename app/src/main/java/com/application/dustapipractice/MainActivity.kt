@@ -3,13 +3,10 @@ package com.application.dustapipractice
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.location.Location
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityManagerCompat
 import com.application.dustapipractice.data.Repository
 import com.application.dustapipractice.data.models.airquality.Grade
 import com.application.dustapipractice.data.models.airquality.MeasuredValue
@@ -18,7 +15,6 @@ import com.application.dustapipractice.databinding.ActivityMainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -93,16 +89,30 @@ class MainActivity : AppCompatActivity() {
         ).addOnSuccessListener { location ->
 
             scope.launch {
-                val mornitoringStation =
-                    Repository.getNearbyMornitoringStation(location.latitude, location.longitude)
+                binding.errorDescriptionTextView.visibility = View.GONE
+                try {
 
 
-                val measuredValue =
-                    Repository.getLatestAirQualityData(mornitoringStation!!.stationName!!)
+                    val mornitoringStation =
+                        Repository.getNearbyMornitoringStation(
+                            location.latitude,
+                            location.longitude
+                        )
 
 
-                displayAirQualityData(mornitoringStation,measuredValue!!)
+                    val measuredValue =
+                        Repository.getLatestAirQualityData(mornitoringStation!!.stationName!!)
 
+
+                    displayAirQualityData(mornitoringStation, measuredValue!!)
+                } catch (excption: Exception) {
+                    binding.errorDescriptionTextView.visibility = View.VISIBLE
+                    binding.contentsLayout.alpha = 0F
+
+                } finally {
+                    binding.progressBar.visibility = View.GONE
+                    binding.refresh.isRefreshing = false
+                }
             }
         }
     }
@@ -112,6 +122,9 @@ class MainActivity : AppCompatActivity() {
         mornitoringStation: MornitoringStation,
         measuredValue: MeasuredValue
     ) {
+        binding.contentsLayout.animate()
+            .alpha(1F)
+            .start()
 
         binding.measuringStationNameTextView.text = mornitoringStation.stationName
         binding.measuringStationAddressTextView.text = mornitoringStation.addr
